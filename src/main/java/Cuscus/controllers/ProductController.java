@@ -3,6 +3,9 @@ package Cuscus.controllers;
 import Cuscus.models.Product;
 import Cuscus.repositories.ProductRepository;
 import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,5 +66,22 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al buscar el producto en Elasticsearch: " + e.getMessage());
         }
     }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<Object> searchProductos(@RequestParam String descripcion) {
+        try {
+            SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+            sourceBuilder.query(QueryBuilders.matchQuery("descripcion", descripcion));
+
+            SearchHits hits = productoRepository.search(sourceBuilder);
+
+            // Recorrer los resultados y devolverlos
+            return ResponseEntity.ok(hits);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al realizar la búsqueda en Elasticsearch: " + e.getMessage());
+        }
+    }
+
 
 }

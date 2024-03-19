@@ -15,6 +15,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.MatchAllQueryBuilder;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +85,14 @@ public class ProductRepository {
     public GetResponse findById(String id) throws IOException {
         GetRequest request = new GetRequest("productos", id);
         return client.get(request, RequestOptions.DEFAULT);
+    }
+
+    public SearchHits search(SearchSourceBuilder sourceBuilder) throws IOException {
+        SearchRequest searchRequest = new SearchRequest("productos");
+        searchRequest.source(sourceBuilder);
+
+        SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
+        return response.getHits();
     }
 
 
